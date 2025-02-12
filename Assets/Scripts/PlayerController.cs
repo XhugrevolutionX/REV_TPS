@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,13 +11,20 @@ public class PlayerController : MonoBehaviour
     private PlayerInputs _inputs;
     private CharacterController _controller;
     private Animator _animator;
-
+    private Camera _mainCamera;
+    
     private float _speedVelocity;
     private float _angleVelocity;
-
     private float _horizontalSpeed;
     
-    private Camera _mainCamera;
+    
+    [SerializeField] private float groundYOffset;
+    [SerializeField] private LayerMask groundMask;
+    [SerializeField] float gravity = -9.81f;
+    private Vector3 _spherePos;
+    private Vector3 _velocity;
+
+
 
     void Start()
     {
@@ -29,32 +37,43 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        _horizontalSpeed = _inputs.IsRunning ? runSpeed : walkSpeed;
+
         if (isRootMotion)
         {
             _animator.applyRootMotion = true;
-        }
-        else
-        {
-            _animator.applyRootMotion = false;
-        }
-        
-        _horizontalSpeed = _inputs.IsRunning ? runSpeed : walkSpeed;
-
-        if (_inputs.Move.magnitude >= Mathf.Epsilon)
-        {
-            //Player movement animation
-            _animator.SetFloat("Speed", Mathf.SmoothDamp(_animator.GetFloat("Speed"), _inputs.Move.magnitude * _horizontalSpeed, ref _speedVelocity, 0.25f));
-
-            RotatePlayerWithCamera();
-            if (!isRootMotion)
+            if (_inputs.Move.magnitude >= Mathf.Epsilon)
             {
-                GetDirectionAndMove();
+                //Player movement animation
+                _animator.SetFloat("Speed", Mathf.SmoothDamp(_animator.GetFloat("Speed"), _inputs.Move.magnitude * _horizontalSpeed, ref _speedVelocity, 0.25f));
+
+                RotatePlayerWithCamera();
+            }
+            else
+            {
+                //Player stops moving
+                _animator.SetFloat("Speed", Mathf.SmoothDamp(_animator.GetFloat("Speed"), 0f, ref _speedVelocity, 0.025f));
             }
         }
         else
         {
-            //Player stops moving
-            _animator.SetFloat("Speed", Mathf.SmoothDamp(_animator.GetFloat("Speed"), 0f, ref _speedVelocity, 0.025f));
+            //Non RootMotion Movement
+            _animator.applyRootMotion = false;
+            if (_inputs.Move.magnitude >= Mathf.Epsilon)
+            {
+                //Player movement animation
+                _animator.SetFloat("Speed", Mathf.SmoothDamp(_animator.GetFloat("Speed"), _inputs.Move.magnitude * _horizontalSpeed, ref _speedVelocity, 0.25f));
+
+                RotatePlayerWithCamera();
+                GetDirectionAndMove();
+            }
+            else
+            {
+                //Player stops moving
+                _animator.SetFloat("Speed", Mathf.SmoothDamp(_animator.GetFloat("Speed"), 0f, ref _speedVelocity, 0.025f));
+            }
+            
+            Gravity();
         }
     }
     private void RotatePlayerWithCamera()
@@ -78,5 +97,20 @@ public class PlayerController : MonoBehaviour
 
         Vector3 direction = cameraForward * _inputs.Move.y + cameraRight * _inputs.Move.x;
         _controller.Move(direction * (_horizontalSpeed * Time.deltaTime));
+    }
+    
+    bool IsGrounded()
+    {
+        _spherePos = new Vector3(_controller.transform.position.x, _controller.transform.position.y - groundYOffset, _controller.transform.position.z);
+        if(Physics.CheckSphere(_spherePos, _controller.radius - 0.05f, groundMask)) return true;
+        return false;
+    }
+    
+    void Gravity()
+    {
+        if(!IsGrounded()) _velocity.y += gravity * Time.deltaTime;
+        else if(_velocity.y < 0) _velocity.y = -2;
+        
+        _controller.Move(_velocity * Time.deltaTime);
     }
 }
