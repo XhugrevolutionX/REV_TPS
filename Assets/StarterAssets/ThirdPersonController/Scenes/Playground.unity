@@ -1850,6 +1850,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2064286745726746120, guid: 6ca57ffece4570047878defcfcfa071a, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3825876793942012644, guid: 6ca57ffece4570047878defcfcfa071a, type: 3}
       propertyPath: m_ControllerManager.Controllers.Array.data[0].Input.Gain
       value: 100
@@ -1865,6 +1869,10 @@ PrefabInstance:
     - target: {fileID: 3825876793942012644, guid: 6ca57ffece4570047878defcfcfa071a, type: 3}
       propertyPath: m_ControllerManager.Controllers.Array.data[1].Input.LegacyGain
       value: -75
+      objectReference: {fileID: 0}
+    - target: {fileID: 5490563508963087632, guid: 6ca57ffece4570047878defcfcfa071a, type: 3}
+      propertyPath: isRootMotion
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5490563508963087632, guid: 6ca57ffece4570047878defcfcfa071a, type: 3}
       propertyPath: rootCharacter
