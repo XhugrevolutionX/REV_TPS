@@ -1,16 +1,28 @@
 using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Item : MonoBehaviour
 {
-   public event Action<Item> OnPicked;
+    [SerializeField] public ItemValues[] values;
+    public ItemValues myItemValue;
+    
+    public event Action<Item> OnPicked;
 
-   void OnTriggerEnter(Collider other)
-   {
-      if (other.CompareTag("Player"))
-      {
-         OnPicked?.Invoke(this);
-         Destroy(gameObject);
-      }
-   }
+    void Start()
+    {
+        myItemValue = values[Random.Range(0, values.Length)];
+    }
+
+
+    void OnTriggerEnter(Collider other)
+    {
+        Debug.Log(myItemValue.itemName);
+        
+        if (other.CompareTag("Player"))
+        {
+            OnPicked?.Invoke(this);
+            Destroy(gameObject);
+        }
+    }
 }

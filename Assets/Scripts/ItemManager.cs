@@ -31,6 +31,6 @@ public class ItemManager : MonoBehaviour
         
         //Delete the item
         _itemsRemaining.Remove(item);
-        _score++;
+        _score += item.myItemValue.scoreValue;
     }
 }
